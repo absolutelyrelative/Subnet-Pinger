@@ -1,8 +1,8 @@
 #!/bin/bash
-source IP_conversions5.sh
+source IPTools.sh
 usage() { echo "Usage: ./pinger.sh [-N netmask] [-I IP] "; exit; }
 
-max_ip=$( ndq2int 255.255.255.255 )
+max_ip=$( dotted2int 255.255.255.255 )
 
 #ARGUMENT CHECK
 while getopts N: opts; do
@@ -45,12 +45,12 @@ then
 	if [ $? == 0 ] #MASK SUCCESS
 	then
 		echo "Rilevata automaticamente Netmask: " $raw_mask
-		mask=$( ndq2int $raw_mask )
+		mask=$( dotted2int $raw_mask )
 		raw_ip=$( cut -f10,10 temp.bin )	#Get IP
 		if [ $? == 0 ] #IP SUCCESS
 		then
 			echo "Rilevato automaticamente IP: " $raw_ip
-			ip=$( ndq2int $raw_ip )
+			ip=$( dotted2int $raw_ip )
 			ip_ctr=$(( $mask & $ip ))	#Bitwise AND
 			echo "Inizio scan da $ip_ctr a $max_ip. I risultati sono stampati su output.txt automaticamente"
 			for((ctr=$ip_ctr; ctr < $max_ip; ctr++))
