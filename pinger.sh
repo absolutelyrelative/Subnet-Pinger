@@ -58,13 +58,13 @@ then
 				echo "Completed, check output.txt"
 
 			else
-				echo "Automatic extraction of Subnet Mask was not successful. Try manually specifying it with -N [Netmask]"
+				echo "Automatic extraction of Subnet Mask was not successful. Try manually specifying it with -n [Netmask]"
 			fi
 		else
-			echo "Automatic extraction of Local IP address was not successful. Try manually specifying it with -I [IP]"
+			echo "Automatic extraction of Local IP address was not successful. Try manually specifying it with -i [IP]"
 		fi
 		else
-			echo "Automatic extraction of Subnet Mask and Local IP unsuccessful. Try manually specifying them with -I [IP] -N [Netmask]"
+			echo "Automatic extraction of Subnet Mask and Local IP unsuccessful. Try manually specifying them with -i [IP] -n [Netmask]"
 	fi
 fi
 if [ $CUSTOM_SUBNET -ne 0 ] && [ $CUSTOM_IP -eq 0 ]
