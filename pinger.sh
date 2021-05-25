@@ -35,10 +35,8 @@ esac
 done
 
 
-if [ $CUSTOM_SUBNET -eq 0 ] || [ $CUSTOM_IP -eq 0 ] #No custom rule set
+if [ $CUSTOM_SUBNET -eq 0 ] && [ $CUSTOM_IP -eq 0 ] #No custom rule set
 then
-	#TODO: Find a more elegant, less cumbersome solution. Perhaps an interface chooser?
-	#		Also, this might not work on Darwin.
 	#Attempt to load Netmask and local IP automatically.
 	ifconfig | grep inet -w | grep -v 127.0.0.1 | tr ' ' '\t'  > temp.bin
 
@@ -56,10 +54,6 @@ then
 				ip=$( dotted2int $raw_ip )
 				ip_ctr=$(( $mask & $ip ))	#Bitwise AND
 				echo "Starting scan from $ip_ctr to $max_ip."
-				if [ $FILE_CHOSEN -eq 1 ]
-				then
-					echo "Outputting to output.txt progressively."
-				fi
 				for((ctr=$(($ip_ctr + 1)); ctr < $max_ip; ctr++))
 				do
 					if [ $FILE_CHOSEN -eq 0 ]
@@ -82,28 +76,12 @@ then
 			echo "Automatic extraction of Subnet Mask and Local IP unsuccessful. Try manually specifying them with -i [IP] -n [Netmask]"
 	fi
 fi
-
-#TODO: Nest these three cases together
-if [ $CUSTOM_SUBNET -ne 0 ] && [ $CUSTOM_IP -eq 0 ]
-then
-	echo "You have to specify a Custom IP too."
-	usage
-fi
-if [ $CUSTOM_SUBNET -eq 0 ] && [ $CUSTOM_IP -ne 0 ]
-then
-	echo "You have to specify a Custom Subnet too."
-	usage
-fi
 if [ $CUSTOM_SUBNET -ne 0 ] && [ $CUSTOM_IP -ne 0 ]
 then
 	mask=$( dotted2int $CUSTOM_SUBNET )
 	ip=$( dotted2int $CUSTOM_IP )
 	ip_ctr=$(( $mask & $ip ))	#Bitwise AND
 	echo "Starting scan from $ip_ctr to $max_ip."
-	if [ $FILE_CHOSEN -eq 0 ]
-	then
-		echo "Outputting to output.txt progressively."
-	fi
 	for((ctr=$(($ip_ctr + 1)); ctr < $max_ip; ctr++))
 	do
 		if [ $FILE_CHOSEN -eq 1 ]
