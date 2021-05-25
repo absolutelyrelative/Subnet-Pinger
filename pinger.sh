@@ -2,13 +2,12 @@
 source IPTools.sh
 usage() { echo "Usage: ./pinger.sh [-n netmask -i IP] [-f]"; exit; }
 
-max_ip=$( dotted2int 255.255.255.255 )
+max_ip=$( dotted2int 255.255.255.255 ) #You could also use 0xffffffff
 CUSTOM_SUBNET=0
 CUSTOM_IP=0
 FILE_CHOSEN=0
 
 #ARGUMENT CHECK
-#TODO: *Actually* implement usage of arguments
 while getopts "n:i:f" opts; do
 	case "${opts}" in
 		n) CUSTOM_SUBNET=${OPTARG}
@@ -34,9 +33,13 @@ while getopts "n:i:f" opts; do
 		;;
 esac
 done
+
+
 if [ $CUSTOM_SUBNET -eq 0 ] || [ $CUSTOM_IP -eq 0 ] #No custom rule set
 then
-	#Attempt to load Netmask and local IP automatically
+	#TODO: Find a more elegant, less cumbersome solution. Perhaps an interface chooser?
+	#		Also, this might not work on Darwin.
+	#Attempt to load Netmask and local IP automatically.
 	ifconfig | grep inet -w | grep -v 127.0.0.1 | tr ' ' '\t'  > temp.bin
 
 	if [ $? -eq 0 ] #SUCCESS
@@ -79,6 +82,8 @@ then
 			echo "Automatic extraction of Subnet Mask and Local IP unsuccessful. Try manually specifying them with -i [IP] -n [Netmask]"
 	fi
 fi
+
+#TODO: Nest these three cases together
 if [ $CUSTOM_SUBNET -ne 0 ] && [ $CUSTOM_IP -eq 0 ]
 then
 	echo "You have to specify a Custom IP too."
@@ -109,5 +114,5 @@ then
 		fi
 		#kill $!
 	done
-	echo "Completed, check output.txt"
+	echo "Operation completed."
 fi
