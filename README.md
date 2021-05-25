@@ -4,7 +4,10 @@
  Watch out, you might DOS your own subnet! I'm not responsible for damages if so, consider yourselves warned! :D
 
 # Usage
-./pinger.sh [-n netmask -i IP]
+./pinger.sh [-n netmask -i IP] [-f]
+ -n Allows you to specify a custom netmask in the dotted decimal convention.
+ -i Allows you to specify a custom ip in the dotted decimal convention.
+ -f Enables file logging (saves found devices in a text file).
 
 Example:
 ./pinger.sh -n 255.255.255.0 -i 192.168.2.1
