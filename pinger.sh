@@ -1,14 +1,15 @@
 #!/bin/bash
 source IPTools.sh
-usage() { echo "Usage: ./pinger.sh [-n netmask -i IP] "; exit; }
+usage() { echo "Usage: ./pinger.sh [-n netmask -i IP] [-f]"; exit; }
 
 max_ip=$( dotted2int 255.255.255.255 )
 CUSTOM_SUBNET=0
 CUSTOM_IP=0
+FILE_CHOSEN=0
 
 #ARGUMENT CHECK
 #TODO: *Actually* implement usage of arguments
-while getopts "n:i:" opts; do
+while getopts "n:i:f" opts; do
 	case "${opts}" in
 		n) CUSTOM_SUBNET=${OPTARG}
 		TEMP1=$( dotted2int ${CUSTOM_SUBNET} )
@@ -26,9 +27,11 @@ while getopts "n:i:" opts; do
 			usage
 		fi
 		;;
-    *)
-    usage
-    ;;
+		f) FILE_CHOSEN=1
+		;;
+		*) 
+			usage
+		;;
 esac
 done
 if [ $CUSTOM_SUBNET -eq 0 ] || [ $CUSTOM_IP -eq 0 ] #No custom rule set
@@ -49,13 +52,22 @@ then
 				echo "Local IP automatically detected: " $raw_ip
 				ip=$( dotted2int $raw_ip )
 				ip_ctr=$(( $mask & $ip ))	#Bitwise AND
-				echo "Starting scan from $ip_ctr to $max_ip. Results will be added to output.txt progressively."
-				for((ctr=$ip_ctr; ctr < $max_ip; ctr++))
+				echo "Starting scan from $ip_ctr to $max_ip."
+				if [ $FILE_CHOSEN -eq 1 ]
+				then
+					echo "Outputting to output.txt progressively."
+				fi
+				for((ctr=$(($ip_ctr + 1)); ctr < $max_ip; ctr++))
 				do
-					ping -a -W 1 -c 1 -i 200 -b $ctr | grep "from" >> output.txt &
+					if [ $FILE_CHOSEN -eq 0 ]
+					then
+						(ping -a -W 1 -c 1 -i 200 $ctr | grep "from" &)
+					else
+						ping -a -W 1 -c 1 -i 200 $ctr | grep "from" >> output.txt &
+					fi
 					#kill $!
 				done
-				echo "Completed, check output.txt"
+				echo "Operation completed."
 
 			else
 				echo "Automatic extraction of Subnet Mask was not successful. Try manually specifying it with -n [Netmask]"
@@ -82,10 +94,19 @@ then
 	mask=$( dotted2int $CUSTOM_SUBNET )
 	ip=$( dotted2int $CUSTOM_IP )
 	ip_ctr=$(( $mask & $ip ))	#Bitwise AND
-	echo "Starting scan from $ip_ctr to $max_ip. Results will be added to output.txt progressively."
-	for((ctr=$ip_ctr; ctr < $max_ip; ctr++))
+	echo "Starting scan from $ip_ctr to $max_ip."
+	if [ $FILE_CHOSEN -eq 0 ]
+	then
+		echo "Outputting to output.txt progressively."
+	fi
+	for((ctr=$(($ip_ctr + 1)); ctr < $max_ip; ctr++))
 	do
-		ping -a -W 1 -c 1 -i 200 -b $ctr | grep "from" >> output.txt &
+		if [ $FILE_CHOSEN -eq 1 ]
+		then
+			(ping -a -W 1 -c 1 -i 200 $ctr | grep "from" &)
+		else
+			ping -a -W 1 -c 1 -i 200 $ctr | grep "from" >> output.txt &
+		fi
 		#kill $!
 	done
 	echo "Completed, check output.txt"
