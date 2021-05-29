@@ -37,7 +37,7 @@ done
 
 if [ $CUSTOM_SUBNET -eq 0 ] && [ $CUSTOM_IP -eq 0 ] #No custom rule set
 then
-	#Attempt to load Netmask and local IP automatically.
+	#Attempt to load Netmask and local IP automatically (This should work on both Linux & Darwin)
 	ifconfig | grep inet -w | grep -v 127.0.0.1 | tr ' ' '\t'  > temp.bin
 
 	if [ $? -eq 0 ] #SUCCESS
